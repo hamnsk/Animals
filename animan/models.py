@@ -34,7 +34,7 @@ class ShelterPhoto(models.Model):
     class Meta:
         verbose_name = _('Фотография')
         verbose_name_plural = _('Фотографии')
-        db_table = 'pet_image_table'
+        db_table = 'shelter_image_table'
 
 
 class City(models.Model):
@@ -69,6 +69,11 @@ class SocialNetwork(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
+
+    class Meta:
+        verbose_name = _('Социальная сеть')
+        verbose_name_plural = _('Социальные сети')
+        db_table = 'social_network_table'
 
 
 class Pet(models.Model):
@@ -122,3 +127,8 @@ class Shelter(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
+
+    class Meta:
+        verbose_name = _('Приют')
+        verbose_name_plural = _('Приюты')
+        db_table = 'shelter_table'
