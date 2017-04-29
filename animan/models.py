@@ -10,42 +10,6 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-class Pet(models.Model):
-    """Модель реализующая описание конкретного животного и все его характеристики"""
-    LOST = 1
-    FOUND = 2
-    ATTACHED = 3
-    SEARCHED = 4
-
-    PET_STATUS = (
-        (LOST, _(u'Потерянный')),
-        (FOUND, _(u'Найденный')),
-        (ATTACHED, _(u'Дома')),
-        (SEARCHED, _(u'Ищет Дом')),
-    )
-
-    name = models.CharField(verbose_name=_('Кличка'), default='', blank=True, max_length=64)
-    age = models.DecimalField(verbose_name='Возраст', decimal_places=2, max_digits=4, default=0)
-    weight = models.DecimalField(verbose_name='Вес', decimal_places=2, max_digits=4, default=0)
-    height = models.DecimalField(verbose_name='Рост', decimal_places=2, max_digits=4, default=0)
-    pet_status = models.PositiveSmallIntegerField(verbose_name=_('Социальная сеть'), choices=PET_STATUS, default=LOST)
-    comment = models.TextField(verbose_name=_('Описание'), default='', blank=True)
-    photos = GenericRelation(PetPhoto)
-    # owners = GenericRelation(PetOwner)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
-
-    class Meta:
-        verbose_name = _('Питомец')
-        verbose_name_plural = _('Питомцы')
-        db_table = 'pet_table'
-
-    # def __str__(self):
-    #     pass
-    #     # return '{} : {}'.format(str(self.user_id), str(self.app_id))
-
-
 class PetPhoto(models.Model):
     """Модель реализующая фотографию животного"""
     image = models.ImageField(verbose_name='Фотография', upload_to='pets/photos/%Y/%m/%d', blank=True, null=True)
@@ -105,6 +69,42 @@ class SocialNetwork(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
+
+
+class Pet(models.Model):
+    """Модель реализующая описание конкретного животного и все его характеристики"""
+    LOST = 1
+    FOUND = 2
+    ATTACHED = 3
+    SEARCHED = 4
+
+    PET_STATUS = (
+        (LOST, _(u'Потерянный')),
+        (FOUND, _(u'Найденный')),
+        (ATTACHED, _(u'Дома')),
+        (SEARCHED, _(u'Ищет Дом')),
+    )
+
+    name = models.CharField(verbose_name=_('Кличка'), default='', blank=True, max_length=64)
+    age = models.DecimalField(verbose_name='Возраст', decimal_places=2, max_digits=4, default=0)
+    weight = models.DecimalField(verbose_name='Вес', decimal_places=2, max_digits=4, default=0)
+    height = models.DecimalField(verbose_name='Рост', decimal_places=2, max_digits=4, default=0)
+    pet_status = models.PositiveSmallIntegerField(verbose_name=_('Социальная сеть'), choices=PET_STATUS, default=LOST)
+    comment = models.TextField(verbose_name=_('Описание'), default='', blank=True)
+    photos = GenericRelation(PetPhoto)
+    # owners = GenericRelation(PetOwner)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    class Meta:
+        verbose_name = _('Питомец')
+        verbose_name_plural = _('Питомцы')
+        db_table = 'pet_table'
+
+    # def __str__(self):
+    #     pass
+    #     # return '{} : {}'.format(str(self.user_id), str(self.app_id))
 
 
 class Shelter(models.Model):
