@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Pet, PetPhoto, Shelter, ShelterPhoto, City, SocialNetwork
+from .models import Pet, PetPhoto, Shelter, ShelterPhoto, City, SocialNetwork, ShelterAddress, ShelterPhone
 from django.contrib.contenttypes.admin import GenericTabularInline
 
 
@@ -20,8 +20,16 @@ class PetInline(GenericTabularInline):
     inlines = [PetPhotoInline, ]
 
 
+class ShelterAddressInLine(admin.TabularInline):
+    model = ShelterAddress
+
+
+class ShelterPhoneInLine(admin.TabularInline):
+    model = ShelterPhone
+
+
 class ShelterAdmin(admin.ModelAdmin):
-    inlines = [SocialNetworkInLine, ShelterPhotoInLine, PetInline, ]
+    inlines = [ShelterAddressInLine, ShelterPhoneInLine, SocialNetworkInLine, ShelterPhotoInLine, PetInline, ]
 
 
 class CityAdmin(admin.ModelAdmin):
@@ -29,7 +37,7 @@ class CityAdmin(admin.ModelAdmin):
 
 
 class PetAdmin(admin.ModelAdmin):
-    inlines = [PetPhotoInline, ]
+    inlines = [PetPhotoInline,]
 
 
 admin.site.register(Pet, PetAdmin)

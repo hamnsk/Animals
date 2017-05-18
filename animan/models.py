@@ -9,6 +9,19 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+"""
+Абстрактная модель AbstractDateTimeModel для отслеживания времения изменения объекта
+
+"""
+
+
+class AbstractDateTimeModel(models.Model):
+    created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    modified = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
 
 class City(models.Model):
     """Модель реализующая список городов"""
@@ -53,7 +66,7 @@ class SocialNetwork(models.Model):
         db_table = 'social_network_table'
 
 
-class Pet(models.Model):
+class Pet(AbstractDateTimeModel):
     """Модель реализующая описание конкретного животного и все его характеристики"""
     LOST = 1
     FOUND = 2
@@ -95,7 +108,7 @@ class Pet(models.Model):
         return str(self.name)
 
 
-class PetPhoto(models.Model):
+class PetPhoto(AbstractDateTimeModel):
     """Модель реализующая фотографию животного"""
     image = models.ImageField(verbose_name=_('Фотография'), upload_to='pets/photos/%Y/%m/%d', blank=True, null=True)
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, verbose_name=_('Питомец'))
@@ -106,17 +119,13 @@ class PetPhoto(models.Model):
         db_table = 'pet_image_table'
 
 
-class Shelter(models.Model):
+class Shelter(AbstractDateTimeModel):
     """Модель реализующая объект приют"""
     name = models.CharField(verbose_name=_('Название'), default='', blank=True, max_length=200,
                             help_text=_('Укажите название приюта'))
     description = models.CharField(verbose_name=_('Описание'), default='', blank=True, max_length=250,
-                                   help_text=_('Краткое описание приюта'))
-    address = models.CharField(verbose_name=_('Адрес'), default='', blank=True, max_length=200,
-                               help_text=_('Укажите адрес приюта'))
+                                   help_text=_('Краткое описание'))
     site = models.URLField(verbose_name=_('Сайт'), help_text=_('Укажите адрес сайта в формате http(s)://sitename.zone'))
-    phone = models.CharField(verbose_name=_('Телефон'), max_length=11, null=True, blank=True,
-                             help_text=_('Укажите телефон приюта'))
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Владелец'))
     moderators = models.ManyToManyField(User, verbose_name=_('Куратор'), related_name='shelter_moderators_list')
     volunteers = models.ManyToManyField(User, verbose_name=_('Волонтер'), related_name='shelter_volunteers_list')
@@ -133,7 +142,7 @@ class Shelter(models.Model):
         return str(self.name)
 
 
-class ShelterPhoto(models.Model):
+class ShelterPhoto(AbstractDateTimeModel):
     """Модель реализующая фотографию приюта"""
     image = models.ImageField(verbose_name=_('Фотография'), upload_to='shelter/photos/%Y/%m/%d', blank=True, null=True)
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE, verbose_name=_('Приют'))
@@ -142,3 +151,29 @@ class ShelterPhoto(models.Model):
         verbose_name = _('Фотография приюта')
         verbose_name_plural = _('Фотографии приюта')
         db_table = 'shelter_image_table'
+
+
+class ShelterAddress(AbstractDateTimeModel):
+    address = models.CharField(verbose_name=_('Адрес'), default='', blank=True, max_length=250,
+                               help_text=_('Укажите адрес приюта'))
+    shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE, verbose_name=_('Приют'))
+
+    class Meta:
+        verbose_name = _('Адрес приюта')
+        verbose_name_plural = _('Адреса приюта')
+        db_table = 'shelter_address_table'
+
+
+class ShelterPhone(AbstractDateTimeModel):
+    phone = models.CharField(verbose_name=_('Телефон'), max_length=11, null=True, blank=True,
+                             help_text=_('Укажите телефон приюта'))
+    description = models.CharField(verbose_name=_('Описание'), default='', blank=True, max_length=250,
+                                   help_text=_('Краткое описание контакта'))
+    person = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Укажите ответственного пользователя'),
+                               blank=True)
+    shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE, verbose_name=_('Приют'))
+
+    class Meta:
+        verbose_name = _('Телефон приюта')
+        verbose_name_plural = _('Телефон приюта')
+        db_table = 'shelter_phone_table'
