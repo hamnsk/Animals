@@ -11,20 +11,17 @@ from django.contrib.auth.models import User
 
 
 def pets_photo_path(instance, filename):
+    """Установка пути выыгрузки фотографий питомцев"""
     return 'pets/pet_id_{0}/photos/{1}'.format(instance.pet.id, filename)
 
 
 def shelters_photo_path(instance, filename):
+    """Установка пути выгрузки фотографий приютов"""
     return 'shelters/shelter_id_{0}/photos/{1}'.format(instance.shelter.id, filename)
 
 
-"""
-Абстрактная модель AbstractDateTimeModel для отслеживания времения изменения объекта
-
-"""
-
-
 class AbstractDateTimeModel(models.Model):
+    """Абстрактная модель AbstractDateTimeModel для отслеживания времения изменения объекта"""
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -104,6 +101,8 @@ class Pet(AbstractDateTimeModel):
                                  help_text=_('Укажите высоту в холке'))
     pet_status = models.PositiveSmallIntegerField(verbose_name=_('Статус'), choices=PET_STATUS, default=LOST)
     comment = models.TextField(verbose_name=_('Описание'), default='', blank=True, help_text=_('Расскажите о питомце'))
+    avatar = models.ImageField(verbose_name=_('Аватар'), upload_to=pets_photo_path, blank=True, null=True,
+                               help_text=_('Фотография профиля, отображается первой на всех страницах'))
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
@@ -146,6 +145,8 @@ class Shelter(AbstractDateTimeModel):
     cities = models.ManyToManyField(City, verbose_name=_('Город'))
     pets = GenericRelation(Pet)
     social_networks = GenericRelation(SocialNetwork)
+    avatar = models.ImageField(verbose_name=_('Аватар'), upload_to=pets_photo_path, blank=True, null=True,
+                               help_text=_('Фотография профиля, отображается первой на всех страницах'))
 
     class Meta:
         verbose_name = _('Приют')
