@@ -10,44 +10,21 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-class PetPhoto(models.Model):
-    """Модель реализующая фотографию животного"""
-    image = models.ImageField(verbose_name='Фотография', upload_to='pets/photos/%Y/%m/%d', blank=True, null=True)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
-    # author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Автор'))
-
-    class Meta:
-        verbose_name = _('Фотография')
-        verbose_name_plural = _('Фотографии')
-        db_table = 'pet_image_table'
-
-
-class ShelterPhoto(models.Model):
-    """Модель реализующая фотографию приюта"""
-    image = models.ImageField(verbose_name='Фотография', upload_to='pets/photos/%Y/%m/%d', blank=True, null=True)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
-
-    class Meta:
-        verbose_name = _('Фотография')
-        verbose_name_plural = _('Фотографии')
-        db_table = 'shelter_image_table'
-
-
 class City(models.Model):
     """Модель реализующая список городов"""
-    name = models.CharField(verbose_name=_('Наименование'), default='', blank=True, max_length=200)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
+    name = models.CharField(verbose_name=_('Наименование'),
+                            default='',
+                            blank=True,
+                            max_length=200,
+                            help_text=_('Введите наименование города'))
 
     class Meta:
         verbose_name = _('Город')
         verbose_name_plural = _('Города')
         db_table = 'city_table'
+
+    def __str__(self):
+        return str(self.name)
 
 
 class SocialNetwork(models.Model):
@@ -90,14 +67,21 @@ class Pet(models.Model):
         (SEARCHED, _(u'Ищет Дом')),
     )
 
-    name = models.CharField(verbose_name=_('Кличка'), default='', blank=True, max_length=64)
-    age = models.DecimalField(verbose_name='Возраст', decimal_places=2, max_digits=4, default=0)
-    weight = models.DecimalField(verbose_name='Вес', decimal_places=2, max_digits=4, default=0)
-    height = models.DecimalField(verbose_name='Рост', decimal_places=2, max_digits=4, default=0)
-    pet_status = models.PositiveSmallIntegerField(verbose_name=_('Социальная сеть'), choices=PET_STATUS, default=LOST)
-    comment = models.TextField(verbose_name=_('Описание'), default='', blank=True)
-    photos = GenericRelation(PetPhoto)
-    # owners = GenericRelation(PetOwner)
+    name = models.CharField(verbose_name=_('Кличка'),
+                            default='',
+                            blank=True,
+                            max_length=64,
+                            help_text=_('Укажите кличку питомца'))
+    age = models.DecimalField(verbose_name=_('Возраст'),
+                              decimal_places=2,
+                              max_digits=4, default=0,
+                              help_text=_('Введите возраст питомца'))
+    weight = models.DecimalField(verbose_name=_('Вес'), decimal_places=2, max_digits=4, default=0,
+                                 help_text=_('Укажите вес питомца'))
+    height = models.DecimalField(verbose_name=_('Рост'), decimal_places=2, max_digits=4, default=0,
+                                 help_text=_('Укажите высоту в холке'))
+    pet_status = models.PositiveSmallIntegerField(verbose_name=_('Статус'), choices=PET_STATUS, default=LOST)
+    comment = models.TextField(verbose_name=_('Описание'), default='', blank=True, help_text=_('Расскажите о питомце'))
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
@@ -107,28 +91,54 @@ class Pet(models.Model):
         verbose_name_plural = _('Питомцы')
         db_table = 'pet_table'
 
-    # def __str__(self):
-    #     pass
-    #     # return '{} : {}'.format(str(self.user_id), str(self.app_id))
+    def __str__(self):
+        return str(self.name)
+
+
+class PetPhoto(models.Model):
+    """Модель реализующая фотографию животного"""
+    image = models.ImageField(verbose_name=_('Фотография'), upload_to='pets/photos/%Y/%m/%d', blank=True, null=True)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, verbose_name=_('Питомец'))
+
+    class Meta:
+        verbose_name = _('Фотография питомца')
+        verbose_name_plural = _('Фотографии питомца')
+        db_table = 'pet_image_table'
 
 
 class Shelter(models.Model):
     """Модель реализующая объект приют"""
-    name = models.CharField(verbose_name=_('Название'), default='', blank=True, max_length=200)
-    description = models.CharField(verbose_name=_('Описание'), default='', blank=True, max_length=250)
-    address = models.CharField(verbose_name=_('Адрес'), default='', blank=True, max_length=200)
-    site = models.URLField(verbose_name=_('Сайт'))
-    phone = models.CharField(verbose_name=_('Телефон'), max_length=11, null=True, blank=True)
+    name = models.CharField(verbose_name=_('Название'), default='', blank=True, max_length=200,
+                            help_text=_('Укажите название приюта'))
+    description = models.CharField(verbose_name=_('Описание'), default='', blank=True, max_length=250,
+                                   help_text=_('Краткое описание приюта'))
+    address = models.CharField(verbose_name=_('Адрес'), default='', blank=True, max_length=200,
+                               help_text=_('Укажите адрес приюта'))
+    site = models.URLField(verbose_name=_('Сайт'), help_text=_('Укажите адрес сайта в формате http(s)://sitename.zone'))
+    phone = models.CharField(verbose_name=_('Телефон'), max_length=11, null=True, blank=True,
+                             help_text=_('Укажите телефон приюта'))
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Владелец'))
-    cities = GenericRelation(City)
-    photos = GenericRelation(ShelterPhoto)
+    moderators = models.ManyToManyField(User, verbose_name=_('Куратор'), related_name='shelter_moderators_list')
+    volunteers = models.ManyToManyField(User, verbose_name=_('Волонтер'), related_name='shelter_volunteers_list')
+    cities = models.ManyToManyField(City, verbose_name=_('Город'))
     pets = GenericRelation(Pet)
     social_networks = GenericRelation(SocialNetwork)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta:
         verbose_name = _('Приют')
         verbose_name_plural = _('Приюты')
         db_table = 'shelter_table'
+
+    def __str__(self):
+        return str(self.name)
+
+
+class ShelterPhoto(models.Model):
+    """Модель реализующая фотографию приюта"""
+    image = models.ImageField(verbose_name=_('Фотография'), upload_to='shelter/photos/%Y/%m/%d', blank=True, null=True)
+    shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE, verbose_name=_('Приют'))
+
+    class Meta:
+        verbose_name = _('Фотография приюта')
+        verbose_name_plural = _('Фотографии приюта')
+        db_table = 'shelter_image_table'
