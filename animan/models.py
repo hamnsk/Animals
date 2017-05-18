@@ -9,6 +9,15 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+
+def pets_photo_path(instance, filename):
+    return 'pets/pet_id_{0}/photos/{1}'.format(instance.pet.id, filename)
+
+
+def shelters_photo_path(instance, filename):
+    return 'shelters/shelter_id_{0}/photos/{1}'.format(instance.shelter.id, filename)
+
+
 """
 Абстрактная модель AbstractDateTimeModel для отслеживания времения изменения объекта
 
@@ -110,13 +119,18 @@ class Pet(AbstractDateTimeModel):
 
 class PetPhoto(AbstractDateTimeModel):
     """Модель реализующая фотографию животного"""
-    image = models.ImageField(verbose_name=_('Фотография'), upload_to='pets/photos/%Y/%m/%d', blank=True, null=True)
+    image = models.ImageField(verbose_name=_('Фотография'), upload_to=pets_photo_path, blank=True, null=True)
+    description = models.CharField(verbose_name=_('Описание'), default='', blank=True, max_length=250,
+                                   help_text=_('Краткое описание'))
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, verbose_name=_('Питомец'))
 
     class Meta:
         verbose_name = _('Фотография питомца')
         verbose_name_plural = _('Фотографии питомца')
         db_table = 'pet_image_table'
+
+    def __str__(self):
+        return 'Фотография {}'.format(str(self.pk))
 
 
 class Shelter(AbstractDateTimeModel):
@@ -144,13 +158,18 @@ class Shelter(AbstractDateTimeModel):
 
 class ShelterPhoto(AbstractDateTimeModel):
     """Модель реализующая фотографию приюта"""
-    image = models.ImageField(verbose_name=_('Фотография'), upload_to='shelter/photos/%Y/%m/%d', blank=True, null=True)
+    image = models.ImageField(verbose_name=_('Фотография'), upload_to=shelters_photo_path, blank=True, null=True)
+    description = models.CharField(verbose_name=_('Описание'), default='', blank=True, max_length=250,
+                                   help_text=_('Краткое описание'))
     shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE, verbose_name=_('Приют'))
 
     class Meta:
         verbose_name = _('Фотография приюта')
         verbose_name_plural = _('Фотографии приюта')
         db_table = 'shelter_image_table'
+
+    def __str__(self):
+        return 'Фотография {}'.format(str(self.pk))
 
 
 class ShelterAddress(AbstractDateTimeModel):
@@ -162,6 +181,9 @@ class ShelterAddress(AbstractDateTimeModel):
         verbose_name = _('Адрес приюта')
         verbose_name_plural = _('Адреса приюта')
         db_table = 'shelter_address_table'
+
+    def __str__(self):
+        return 'Адрес {}'.format(str(self.pk))
 
 
 class ShelterPhone(AbstractDateTimeModel):
@@ -175,5 +197,8 @@ class ShelterPhone(AbstractDateTimeModel):
 
     class Meta:
         verbose_name = _('Телефон приюта')
-        verbose_name_plural = _('Телефон приюта')
+        verbose_name_plural = _('Телефоны приюта')
         db_table = 'shelter_phone_table'
+
+    def __str__(self):
+        return 'Телефон {}'.format(str(self.pk))
