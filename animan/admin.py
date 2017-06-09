@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Pet, PetPhoto, Shelter, ShelterPhoto, City, SocialNetwork, ShelterAddress, ShelterPhone
+from .models import Pet, PetPhoto, Shelter, ShelterPhoto, City, SocialNetwork, ShelterAddress, ShelterPhone,\
+    PetKind, PetBreed
 from django.contrib.contenttypes.admin import GenericTabularInline
 
 
@@ -41,7 +42,7 @@ class ShelterAdmin(admin.ModelAdmin):
     inlines = [ShelterAddressInLine, ShelterPhoneInLine, SocialNetworkInLine, ShelterPhotoInLine, PetInline, ]
     fieldsets = (
         (None, {
-            'fields': ('name', 'description', 'site', 'owner', )
+            'fields': ('name', 'description', 'site', 'owner', 'avatar')
         }),
         ('Настройки членов приюта', {
             'classes': ('collapse',),
@@ -62,13 +63,25 @@ class CityAdmin(admin.ModelAdmin):
     pass
 
 
+class PetKindAdmin(admin.ModelAdmin):
+    pass
+
+
+class PetBreedAdmin(admin.ModelAdmin):
+    pass
+
+
 class PetAdmin(admin.ModelAdmin):
     inlines = [PetPhotoInline, ]
-    list_display = ('name', 'age', 'pet_status', )
-    search_fields = ('name', 'age', 'pet_status', 'comment',)
-    list_filter = ('name', 'age', 'pet_status', )
+    list_display = ('name', 'kind', 'breed', 'age', 'pet_status', )
+    search_fields = ('name', 'kind', 'breed', 'age', 'pet_status', 'comment',)
+    list_filter = ('name', 'kind', 'breed', 'age', 'pet_status', )
 
 
 admin.site.register(Pet, PetAdmin)
 admin.site.register(Shelter, ShelterAdmin)
 admin.site.register(City, CityAdmin)
+admin.site.register(PetKind, PetKindAdmin)
+admin.site.register(PetBreed, PetBreedAdmin)
+
+

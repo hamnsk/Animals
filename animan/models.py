@@ -7,17 +7,34 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User
 
+from datetime import datetime
+
+
 # Create your models here.
 
 
 def pets_photo_path(instance, filename):
-    """Установка пути выыгрузки фотографий питомцев"""
-    return 'pets/pet_id_{0}/photos/{1}'.format(instance.pet.id, filename)
+    """Установка пути выгрузки фотографий питомцев"""
+    date_now = datetime.strftime(datetime.now(), "%Y/%m/%d")
+    return 'pets/pet_id_{0}/photos/{1}/{2}'.format(instance.pet.id, date_now, filename)
 
 
 def shelters_photo_path(instance, filename):
     """Установка пути выгрузки фотографий приютов"""
-    return 'shelters/shelter_id_{0}/photos/{1}'.format(instance.shelter.id, filename)
+    date_now = datetime.strftime(datetime.now(), "%Y/%m/%d")
+    return 'shelters/shelter_id_{0}/photos/{1}/{2}'.format(instance.shelter.id, date_now, filename)
+
+
+def shelters_avatar_path(instance, filename):
+    """Установка пути выгрузки фотографий приютов"""
+    date_now = datetime.strftime(datetime.now(), "%Y/%m/%d")
+    return 'shelters/shelter_id_{0}/photos/{1}/{2}'.format(instance.id, date_now, filename)
+
+
+def pets_avatar_path(instance, filename):
+    """Установка пути выгрузки фотографий приютов"""
+    date_now = datetime.strftime(datetime.now(), "%Y/%m/%d")
+    return 'pets/pet_id_{0}/photos/{1}/{2}'.format(instance.id, date_now, filename)
 
 
 class AbstractDateTimeModel(models.Model):
@@ -72,6 +89,46 @@ class SocialNetwork(models.Model):
         db_table = 'social_network_table'
 
 
+class PetKind(AbstractDateTimeModel):
+    """Модель реализующая вид животного: собака, кошка, носорог..."""
+    name = models.CharField(verbose_name=_('Наименование'),
+                            default='Введите вид животного',
+                            blank=False,
+                            max_length=250,
+                            help_text=_('Введите вид животного'))
+    description = models.TextField(verbose_name=_('Описание вида'),
+                                   blank=True,
+                                   help_text=_('Описание вида животного'))
+
+    class Meta:
+        verbose_name = _('Вид животного')
+        verbose_name_plural = _('Виды животных')
+        db_table = 'pets_kind_table'
+
+    def __str__(self):
+        return str(self.name)
+
+
+class PetBreed(AbstractDateTimeModel):
+    """Модель реализующая породу животного: такса, овчарка, перс"""
+    name = models.CharField(verbose_name=_('Наименование'),
+                            default='Введите породу животного',
+                            blank=False,
+                            max_length=250,
+                            help_text=_('Введите название породы животного'))
+    description = models.TextField(verbose_name=_('Описание породы'),
+                                   blank=True,
+                                   help_text=_('Описание породы животного'))
+
+    class Meta:
+        verbose_name = _('Порода животного')
+        verbose_name_plural = _('Породы животных')
+        db_table = 'pets_breed_table'
+
+    def __str__(self):
+        return str(self.name)
+
+
 class Pet(AbstractDateTimeModel):
     """Модель реализующая описание конкретного животного и все его характеристики"""
     LOST = 1
@@ -91,6 +148,8 @@ class Pet(AbstractDateTimeModel):
                             blank=True,
                             max_length=64,
                             help_text=_('Укажите кличку питомца'))
+    kind = models.ForeignKey(PetKind, on_delete=models.CASCADE, verbose_name=_('Вид животного'))
+    breed = models.ForeignKey(PetBreed, on_delete=models.CASCADE, verbose_name=_('Порода животного'))
     age = models.DecimalField(verbose_name=_('Возраст'),
                               decimal_places=2,
                               max_digits=4, default=0,
@@ -101,7 +160,7 @@ class Pet(AbstractDateTimeModel):
                                  help_text=_('Укажите высоту в холке'))
     pet_status = models.PositiveSmallIntegerField(verbose_name=_('Статус'), choices=PET_STATUS, default=LOST)
     comment = models.TextField(verbose_name=_('Описание'), default='', blank=True, help_text=_('Расскажите о питомце'))
-    avatar = models.ImageField(verbose_name=_('Аватар'), upload_to=pets_photo_path, blank=True, null=True,
+    avatar = models.ImageField(verbose_name=_('Аватар'), upload_to=pets_avatar_path, blank=True, null=True,
                                help_text=_('Фотография профиля, отображается первой на всех страницах'))
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -145,7 +204,7 @@ class Shelter(AbstractDateTimeModel):
     cities = models.ManyToManyField(City, verbose_name=_('Город'))
     pets = GenericRelation(Pet)
     social_networks = GenericRelation(SocialNetwork)
-    avatar = models.ImageField(verbose_name=_('Аватар'), upload_to=pets_photo_path, blank=True, null=True,
+    avatar = models.ImageField(verbose_name=_('Аватар'), upload_to=shelters_avatar_path, blank=True, null=True,
                                help_text=_('Фотография профиля, отображается первой на всех страницах'))
 
     class Meta:
