@@ -119,6 +119,7 @@ class PetBreed(AbstractDateTimeModel):
     description = models.TextField(verbose_name=_('Описание породы'),
                                    blank=True,
                                    help_text=_('Описание породы животного'))
+    petkid_id = models.ForeignKey(PetKind, on_delete=models.CASCADE, verbose_name=_('Вид животного'))
 
     class Meta:
         verbose_name = _('Порода животного')
@@ -193,6 +194,15 @@ class PetPhoto(AbstractDateTimeModel):
 
 class Shelter(AbstractDateTimeModel):
     """Модель реализующая объект приют"""
+    PRIVATE = 1
+    STATE = 2
+
+    SHELTER_TYPES = (
+        (PRIVATE, _(u'Частный')),
+        (STATE, _(u'Муниципальный')),
+    )
+    shelter_type = models.PositiveSmallIntegerField(verbose_name=_('Вид приюта'), choices=SHELTER_TYPES,
+                                                    default=STATE)
     name = models.CharField(verbose_name=_('Название'), default='', blank=True, max_length=200,
                             help_text=_('Укажите название приюта'))
     description = models.CharField(verbose_name=_('Описание'), default='', blank=True, max_length=250,
