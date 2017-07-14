@@ -1,0 +1,16 @@
+stages:
+    - deploy
+
+deploy_stage:
+    stage: deploy
+    environment:
+      name: STAGE
+      url: http://animals.karbidsoft.ru/
+    script:
+        - ci/deploy_stage.sh
+    only:
+        - tags
+    tags:
+        - "animals_stage"
+    when: manual
+

@@ -46,6 +46,12 @@ class AbstractDateTimeModel(models.Model):
         abstract = True
 
 
+class Owner(AbstractDateTimeModel):
+    pass
+    class Meta:
+        db_table = 'owner_table'
+
+
 class City(models.Model):
     """Модель реализующая список городов"""
     name = models.CharField(verbose_name=_('Наименование'),
@@ -119,7 +125,7 @@ class PetBreed(AbstractDateTimeModel):
     description = models.TextField(verbose_name=_('Описание породы'),
                                    blank=True,
                                    help_text=_('Описание породы животного'))
-    petkid_id = models.ForeignKey(PetKind, on_delete=models.CASCADE, verbose_name=_('Вид животного'))
+    # petkid_id = models.ForeignKey(PetKind, on_delete=models.CASCADE, verbose_name=_('Вид животного'))
 
     class Meta:
         verbose_name = _('Порода животного')
